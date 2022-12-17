@@ -1,23 +1,75 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int main()
+void list_factors(unsigned long number);
+
+/**
+ * main - main entry point of the program
+ * @argc: count of command line arguments passed to the program
+ * @argv: vector containing command line arguments passed to the program
+ *
+ * Return: Always 0 (EXIT_SUCCESS)
+ */
+int main(int argc, char **argv)
 {
-    long long int num = 239809320265259;
-    long int factor1 = 2;
-    long int factor2;
+	ssize_t num_read;
+	char *value = NULL;
+	size_t line_size = 0;
+	FILE *fp;
+	unsigned long number;
 
-    while (num % factor1)
-    {
-        if (factor1 <= num)
-        {
-            factor1++;
-        }
-        else {
-            return (-1);
-        }
-    }
+	if (argc == 2)
+	{
+		fp = fopen(argv[1], "r");
+		while ((num_read = getline(&value, &line_size, fp)) != -1)
+		{
+			value[strcspn(value, "\n")] = '\0';
+			number = atol(value);
+			list_factors(number);
+		}
+	}
+	else
+	{
+		fprintf(stderr, "Usage: ./factor <file_name>\n");
+		return (EXIT_FAILURE);
+	}
+	fclose(fp);
+	free(value);
+	return (EXIT_SUCCESS);
+}
 
-    factor2 = num / factor1;
-    printf("%lld = %ld * %ld\n", num, factor2, factor1);
-    return (0);
+/**
+ * list_factors - determines and lists the factors of a number
+ * @number: number we wish to evaluate
+ *
+ * Return: void
+ */
+void list_factors(unsigned long number)
+{
+	unsigned long i, j, divisor;
+	int is_prime = 0;
+
+	for (i = 2; i <= number; i++)
+	{
+		if (number % i == 0)
+		{
+			is_prime = 1; /* True */
+			for (j = 2; j <= i/2; j++)
+			{
+				if (i % j == 0)
+				{
+					is_prime = 0; /* False */
+					break;
+				}
+			}
+		}
+
+		if (is_prime)
+		{
+			divisor = i;
+			break;
+		}
+	}
+	printf("%lu=%lu*%lu\n", number, (number / divisor), divisor);
 }
